@@ -1,0 +1,4 @@
+LogFiles/*
+!LogFiles/.gitkeep
+data/mysql/*
+!data/mysql/.gitkeep

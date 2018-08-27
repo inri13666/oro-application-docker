@@ -1,0 +1,20 @@
+version: '3'
+services:
+    oro_instance:
+        container_name: oroplatform_nginx
+        env_file:
+            - ".env"
+        build:
+            context: ./.docker
+        volumes:
+            #- "./:/home/site/wwwroot"
+            - "./.docker/LogFiles:/home/LogFiles"
+        ports:
+            #NGINX
+            - "9666:8000"
+            #SSH
+            - "2222:2222"
+            #xDebug
+            #- "9000:9000"
+            #MySQL
+            #- "8989"3306"
