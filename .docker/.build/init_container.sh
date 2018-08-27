@@ -9,6 +9,8 @@
 eval $(echo "[www]" > /etc/php/7.1/fpm/pool.d/env.conf)
 eval $(env | sed "s/\(.*\)=\(.*\)/env[\1]='\2'/" >> /etc/php/7.1/fpm/pool.d/env.conf)
 
+export SYMFONY_ENV=prod
+
 # setup server root
 test ! -d "$HOME_SITE" && echo "INFO: $HOME_SITE not found. creating..." && mkdir -p "$HOME_SITE"
 if [ ! $WEBSITES_ENABLE_APP_SERVICE_STORAGE ]; then
@@ -46,6 +48,8 @@ mysql -u root -e 'CREATE DATABASE IF NOT EXISTS oro_database;' && \
 mysql -u root oro_database < /home/site/database.mysql
 
 echo "Starting consumer"
-sudo -u www-data app oro:message-queue:consume -vvv & 1> /dev/stdout 2>/dev/stderr
+rm -rf /home/site/wwwroot/app/cache/pr* && \
+rm -rf /home/site/wwwroot/app/cache/de* && \
+sudo -u www-data app oro:message-queue:consume -vvv --env=prod & 1> /dev/stdout 2>/dev/stderr
 
 /sbin/my_init

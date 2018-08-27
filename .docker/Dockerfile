@@ -1,6 +1,6 @@
 FROM phusion/baseimage:0.9.15
 
-MAINTAINER Mikita Makarov <mesaverde228@gmail.com>
+MAINTAINER Nikita Makarov <mesaverde228@gmail.com>
 
 # Ensure UTF-8
 RUN locale-gen en_US.UTF-8
@@ -9,8 +9,6 @@ ENV LC_ALL     en_US.UTF-8
 
 ENV HOME        /root
 ENV SYMFONY_ENV prod
-
-ARG APPLICATION_URL=http://oro-commerce.example.com
 
 #Web Site Home
 ENV HOME_SITE "/home/site/wwwroot"
@@ -98,7 +96,15 @@ USER root
 
 WORKDIR /home/site/wwwroot
 
-COPY .dist /home/site/wwwroot
+ARG APPLICATION_NAME=crm-application
+ARG APPLICATION_VERSION=2.6.26
+ARG APPLICATION_URL=http://${APPLICATION_NAME}.example.com
+ENV APPLICATION_DISTRIBUTIVE=${APPLICATION_NAME}-${APPLICATION_VERSION}.tar.bz2
+
+#COPY .dist /home/site/wwwroot
+RUN wget https://github.com/oroinc/${APPLICATION_NAME}/releases/download/${APPLICATION_VERSION}/${APPLICATION_DISTRIBUTIVE} && \
+    tar -C /home/site/wwwroot --strip-components=1 -xvjf ${APPLICATION_DISTRIBUTIVE} ${APPLICATION_NAME} && \
+    rm -rf ${APPLICATION_DISTRIBUTIVE}
 
 # Install MySQL.
 RUN \
@@ -114,7 +120,6 @@ RUN \
   echo "mysql -e 'CREATE DATABASE IF NOT EXISTS oro_database;'" >> /tmp/config && \
   bash /tmp/config && \
   rm -f /tmp/config && \
-  ls -la /home/site/wwwroot/app/config && \
   sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.1/fpm/php.ini && \
   sed -i -e 's/database_driver: .*/database_driver: pdo_mysql /g' /home/site/wwwroot/app/config/parameters.yml && \
   sed -i -e 's/database_user: .*/database_user: root /g' /home/site/wwwroot/app/config/parameters.yml && \

@@ -1,2 +1,2 @@
 docker login
-docker push inri13666/orocommerce-application:latest
+docker push inri13666/%1:%2
